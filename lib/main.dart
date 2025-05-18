@@ -1,9 +1,14 @@
-import 'user_database.dart';
+import 'user_database.dart' as user_db;
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'pages/expense_home_page.dart';
 import 'pages/login_page.dart';
+import 'pages/landing_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const RootApp());
 }
 
@@ -39,13 +44,13 @@ class AuthService {
     String? name,
     String? email,
   }) async {
-    final user = User(
+    final user = user_db.User(
       name: name ?? '',
       email: email ?? '',
       username: username,
       password: password,
     );
-    final db = UserDatabase.instance;
+    final db = user_db.UserDatabase.instance;
     final existing = await db.getUserByUsername(username);
     if (existing != null) return false; // Username already exists
     await db.insertUser(user);
@@ -54,7 +59,7 @@ class AuthService {
   }
 
   static Future<bool> login(String username, String password) async {
-    final db = UserDatabase.instance;
+    final db = user_db.UserDatabase.instance;
     final user = await db.getUserByUsernameAndPassword(username, password);
     if (user != null) {
       _currentUsername = username;
@@ -82,6 +87,7 @@ class RootApp extends StatefulWidget {
 }
 
 class _RootAppState extends State<RootApp> {
+  bool _showLanding = true;
   bool _loggedIn = false;
   bool _loading = true;
   String? _username;
@@ -93,76 +99,92 @@ class _RootAppState extends State<RootApp> {
   }
 
   Future<void> _checkLogin() async {
-    _loggedIn = await AuthService.isLoggedIn();
-    _username = AuthService.getCurrentUsername();
+    // Check FirebaseAuth for Google login
+    final firebase = await FirebaseAuth.instance.authStateChanges().first;
+    if (firebase != null && firebase.email != null) {
+      setState(() {
+        _loggedIn = true;
+        _username = firebase.email;
+        _loading = false;
+        _showLanding = false;
+      });
+      return;
+    }
     setState(() {
+      _loggedIn = false;
+      _username = null;
       _loading = false;
     });
   }
 
-  void _onLoginSuccess(String username) {
+  void _onLogin(String username) {
     setState(() {
       _loggedIn = true;
       _username = username;
     });
   }
 
+  void _onLogout() {
+    setState(() {
+      _loggedIn = false;
+      _username = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
+    if (_loading)
       return const MaterialApp(
         home: Scaffold(body: Center(child: CircularProgressIndicator())),
       );
-    }
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Expense Tracker',
       theme: ThemeData(
-        fontFamily: 'PlayfairDisplay',
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Color(0xFF09233D),
-          secondary: Color(0xFF5FCB83),
+        primaryColor: Color(0xFFFFD600),
+        scaffoldBackgroundColor: Colors.black,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: Color(0xFFFFD600),
+          secondary: Colors.black,
+          background: Colors.black,
         ),
-        scaffoldBackgroundColor: Color(0xFF09233D),
-        useMaterial3: true,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFFFFD600),
+          foregroundColor: Colors.black,
+          elevation: 0,
+        ),
         textTheme: const TextTheme(
-          headlineMedium: TextStyle(
-            fontFamily: 'PlayfairDisplay',
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFFFAFAFA), 
-            letterSpacing: 1.2,
-          ),
+          bodyLarge: TextStyle(color: Colors.white),
+          bodyMedium: TextStyle(color: Colors.white),
           titleLarge: TextStyle(
-            fontFamily: 'PlayfairDisplay',
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFFFAFAFA), // Brighter white for contrast
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
           ),
-          bodyLarge: TextStyle(
-            fontFamily: 'PlayfairDisplay',
-            fontSize: 18,
-            color: Color(0xFFFAFAFA), // Brighter white for contrast
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFFFFD600),
+            foregroundColor: Colors.black,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
           ),
-          bodyMedium: TextStyle(
-            fontFamily: 'PlayfairDisplay',
-            fontSize: 16,
-            color: Color(0xFFB0C4DE), // Soft blue for secondary text
-          ),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(),
+          labelStyle: TextStyle(color: Colors.black),
         ),
       ),
       home:
-          _loggedIn && _username != null
-              ? ExpenseHomePage(
-                username: _username!,
-                onLogout:
-                    () => setState(() {
-                      _loggedIn = false;
-                      _username = null;
-                    }),
+          _showLanding
+              ? LandingPage(
+                onContinue: () => setState(() => _showLanding = false),
               )
-              : LoginPage(
-                onLoginSuccess: (username) => _onLoginSuccess(username),
-              ),
+              : _loggedIn
+              ? ExpenseHomePage(username: _username!, onLogout: _onLogout)
+              : LoginPage(onLoginSuccess: _onLogin),
     );
   }
 }

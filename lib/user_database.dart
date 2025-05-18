@@ -103,6 +103,11 @@ class UserDatabase {
     return null;
   }
 
+  Future<void> deleteAllUsers() async {
+    final db = await instance.database;
+    await db.delete('users');
+  }
+
   Future close() async {
     final db = await instance.database;
     db.close();

@@ -5,6 +5,10 @@ import '../expense_database.dart';
 import '../main.dart';
 import '../fixed_charge_database.dart' as fixed_db;
 
+final Color kYellow = Color(0xFFFFD600);
+final Color kBlack = Colors.black;
+final Color kWhite = Colors.white;
+
 class ExpenseHomePage extends StatefulWidget {
   final VoidCallback? onLogout;
   final String username;
@@ -109,24 +113,24 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                   'Add Expense',
                   style: Theme.of(
                     context,
-                  ).textTheme.titleLarge!.copyWith(color: Colors.black),
+                  ).textTheme.titleLarge!.copyWith(color: kBlack),
                 ),
                 const SizedBox(height: 16),
                 TextField(
-                  style: const TextStyle(color: Colors.black),
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: kBlack),
+                  decoration: InputDecoration(
                     labelText: 'Title',
-                    labelStyle: TextStyle(color: Colors.black),
+                    labelStyle: TextStyle(color: kBlack),
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (val) => title = val,
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  style: const TextStyle(color: Colors.black),
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: kBlack),
+                  decoration: InputDecoration(
                     labelText: 'Amount',
-                    labelStyle: TextStyle(color: Colors.black),
+                    labelStyle: TextStyle(color: kBlack),
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
@@ -140,21 +144,18 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                           .map(
                             (cat) => DropdownMenuItem(
                               value: cat,
-                              child: Text(
-                                cat,
-                                style: const TextStyle(color: Colors.black),
-                              ),
+                              child: Text(cat, style: TextStyle(color: kBlack)),
                             ),
                           )
                           .toList(),
                   onChanged: (val) => category = val!,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Category',
-                    labelStyle: TextStyle(color: Colors.black),
+                    labelStyle: TextStyle(color: kBlack),
                     border: OutlineInputBorder(),
                   ),
-                  dropdownColor: Colors.white,
-                  style: const TextStyle(color: Colors.black),
+                  dropdownColor: kWhite,
+                  style: TextStyle(color: kBlack),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -211,19 +212,19 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Settings',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: kBlack,
                         ),
                       ),
                       const SizedBox(height: 20),
                       TextField(
                         keyboardType: TextInputType.number,
-                        style: const TextStyle(color: Colors.black),
-                        decoration: const InputDecoration(
+                        style: TextStyle(color: Colors.black),
+                        decoration: InputDecoration(
                           labelText: 'Monthly Income',
                           labelStyle: TextStyle(color: Colors.black),
                           border: OutlineInputBorder(),
@@ -238,22 +239,16 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                       ),
                       ..._fixedCharges.map(
                         (c) => ListTile(
-                          title: Text(
-                            c.title,
-                            style: const TextStyle(color: Colors.black),
-                          ),
+                          title: Text(c.title, style: TextStyle(color: kBlack)),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 '₹${c.amount.toStringAsFixed(2)}',
-                                style: const TextStyle(color: Colors.black),
+                                style: TextStyle(color: kBlack),
                               ),
                               IconButton(
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
+                                icon: Icon(Icons.delete, color: Colors.red),
                                 onPressed: () async {
                                   await _deleteFixedCharge(c.id!);
                                   await _loadFixedCharges();
@@ -268,30 +263,30 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                         children: [
                           Expanded(
                             child: TextField(
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: 'Title',
-                                labelStyle: TextStyle(color: Colors.black),
+                                labelStyle: TextStyle(color: kBlack),
                                 border: OutlineInputBorder(),
                               ),
-                              style: const TextStyle(color: Colors.black),
+                              style: TextStyle(color: kBlack),
                               controller: fixedTitleController,
                             ),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: TextField(
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: 'Amount',
-                                labelStyle: TextStyle(color: Colors.black),
+                                labelStyle: TextStyle(color: kBlack),
                                 border: OutlineInputBorder(),
                               ),
-                              style: const TextStyle(color: Colors.black),
+                              style: TextStyle(color: kBlack),
                               keyboardType: TextInputType.number,
                               controller: fixedAmountController,
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.add, color: Colors.teal),
+                            icon: Icon(Icons.add, color: kYellow),
                             onPressed: () async {
                               final title = fixedTitleController.text.trim();
                               final amountText =
@@ -349,16 +344,16 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF09233D),
+      backgroundColor: kBlack,
       appBar: AppBar(
         title: const Text('Expense Tracker'),
-        backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
+        backgroundColor: kYellow,
+        foregroundColor: kBlack,
         elevation: 0,
         actions: [
           if (widget.onLogout != null)
             IconButton(
-              icon: const Icon(Icons.logout),
+              icon: Icon(Icons.logout),
               onPressed: () async {
                 await AuthService.logout();
                 if (widget.onLogout != null) widget.onLogout!();
@@ -366,7 +361,7 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
               tooltip: 'Logout',
             ),
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: Icon(Icons.settings),
             onPressed: _showSettingsSheet,
             tooltip: 'Settings',
           ),
@@ -374,10 +369,9 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
       ),
       body:
           _loading
-              ? const Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator(color: kYellow))
               : Column(
                 children: [
-                  // The original green box header with the percent bar inside
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 700),
                     curve: Curves.easeInOut,
@@ -386,9 +380,9 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                       vertical: 32,
                       horizontal: 24,
                     ),
-                    decoration: const BoxDecoration(
-                      color: Colors.teal, // green box
-                      borderRadius: BorderRadius.vertical(
+                    decoration: BoxDecoration(
+                      color: kYellow,
+                      borderRadius: const BorderRadius.vertical(
                         bottom: Radius.circular(32),
                       ),
                     ),
@@ -410,10 +404,8 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                                         : (_totalExpenses + fixedChargesTotal) /
                                             monthlySalary,
                                 center: const SizedBox.shrink(),
-                                progressColor:
-                                    Colors
-                                        .transparent, // We'll draw custom arcs
-                                backgroundColor: Colors.green.shade200,
+                                progressColor: Colors.transparent,
+                                backgroundColor: kWhite,
                                 circularStrokeCap: CircularStrokeCap.round,
                                 animation: true,
                               ),
@@ -434,8 +426,8 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                                 children: [
                                   Text(
                                     '₹${(_availableSalary - _totalExpenses).clamp(0, monthlySalary).toStringAsFixed(0)}',
-                                    style: const TextStyle(
-                                      color: Colors.black,
+                                    style: TextStyle(
+                                      color: kBlack,
                                       fontSize: 28,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -443,8 +435,8 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                                   const SizedBox(height: 4),
                                   Text(
                                     'remaining',
-                                    style: const TextStyle(
-                                      color: Colors.black54,
+                                    style: TextStyle(
+                                      color: kBlack.withOpacity(0.7),
                                       fontSize: 16,
                                     ),
                                   ),
@@ -454,9 +446,12 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        const Text(
+                        Text(
                           'Total Expenses',
-                          style: TextStyle(color: Colors.white70, fontSize: 16),
+                          style: TextStyle(
+                            color: kBlack.withOpacity(0.7),
+                            fontSize: 16,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         TweenAnimationBuilder<double>(
@@ -466,8 +461,8 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                           builder:
                               (context, value, child) => Text(
                                 '₹${value.toStringAsFixed(2)}',
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: kBlack,
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -485,7 +480,8 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                                 duration: const Duration(milliseconds: 600),
                                 child: Text(
                                   'No expenses yet.',
-                                  style: Theme.of(context).textTheme.bodyLarge,
+                                  style: Theme.of(context).textTheme.bodyLarge!
+                                      .copyWith(color: kWhite),
                                 ),
                               ),
                             )
@@ -506,26 +502,24 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 24,
                                       ),
-                                      color: Colors.redAccent,
-                                      child: const Icon(
-                                        Icons.delete,
-                                        color: Colors.white,
-                                      ),
+                                      color: kYellow,
+                                      child: Icon(Icons.delete, color: kBlack),
                                     ),
                                     onDismissed: (_) async {
                                       await _deleteExpense(e);
                                     },
                                     child: Card(
+                                      color: kWhite,
                                       elevation: 2,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       child: ListTile(
                                         leading: CircleAvatar(
-                                          backgroundColor: Colors.teal.shade100,
+                                          backgroundColor: kYellow,
                                           child: Icon(
                                             getCategoryIcon(e.category),
-                                            color: Colors.teal,
+                                            color: kBlack,
                                           ),
                                         ),
                                         title: Text(
@@ -533,10 +527,13 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge!
-                                              .copyWith(color: Colors.black),
+                                              .copyWith(color: kBlack),
                                         ),
                                         subtitle: Text(
                                           '${e.category} • ${e.date.day}/${e.date.month}/${e.date.year}',
+                                          style: TextStyle(
+                                            color: kBlack.withOpacity(0.7),
+                                          ),
                                         ),
                                         trailing: Text(
                                           '-₹${e.amount.toStringAsFixed(2)}',
@@ -558,9 +555,9 @@ class _ExpenseHomePageState extends State<ExpenseHomePage> {
               ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddExpenseSheet,
-        icon: const Icon(Icons.add),
-        label: const Text('Add Expense'),
-        backgroundColor: Colors.teal,
+        icon: Icon(Icons.add, color: kBlack),
+        label: Text('Add Expense', style: TextStyle(color: kBlack)),
+        backgroundColor: kYellow,
       ),
     );
   }
@@ -579,22 +576,19 @@ class _ExpenseArcPainter extends CustomPainter {
   });
 
   static const Map<String, Color> categoryColors = {
-    'Food': Colors.red,
-    'Transport': Colors.blue,
-    'Shopping': Colors.purple,
-    'Bills': Colors.orange,
-    'Other': Colors.teal,
+    'Food': Color(0xFFFFD600), // yellow
+    'Transport': Color(0xFF212121), // black
+    'Shopping': Color(0xFFFFFFFF), // white
+    'Bills': Color(0xFFFFF176), // light yellow
+    'Other': Color(0xFF757575), // dark grey
   };
 
   static final List<Color> fixedChargeColors = [
-    Colors.grey,
-    Colors.blueGrey,
-    Colors.brown,
-    Colors.indigo,
-    Colors.cyan,
-    Colors.deepOrange,
-    Colors.amber,
-    Colors.green,
+    Color(0xFFFFD600),
+    Color(0xFF212121),
+    Color(0xFFFFFFFF),
+    Color(0xFFFFF176),
+    Color(0xFF757575),
   ];
 
   @override
